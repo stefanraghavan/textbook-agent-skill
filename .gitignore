@@ -1,0 +1,6 @@
+.DS_Store
+.venv/
+*.pdf
+markdown_output/
+markdown_output_test/
+roarks_markdown/

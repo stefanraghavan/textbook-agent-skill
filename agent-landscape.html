@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Landscape</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    padding: 40px;
+    min-height: 100vh;
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 40px;
+  }
+
+  /* Spectrum bar */
+  .spectrum {
+    max-width: 1100px;
+    margin: 0 auto 50px;
+    position: relative;
+  }
+  .spectrum-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, #6366f1, #8b5cf6, #a855f7, #d946ef, #f43f5e);
+    margin: 0 20px;
+  }
+  .spectrum-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 0 10px;
+  }
+  .spectrum-labels span {
+    font-size: 12px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Grid layout */
+  .grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .grid .full-width {
+    grid-column: 1 / -1;
+  }
+
+  /* Cards */
+  .card {
+    background: #13131a;
+    border: 1px solid #2a2a3a;
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .card:hover {
+    border-color: #4a4a6a;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .card-badge {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .badge-interactive { background: #1e1b4b; color: #818cf8; }
+  .badge-automated { background: #1a1b2e; color: #a78bfa; }
+  .badge-platform { background: #2d1a3e; color: #c084fc; }
+  .badge-framework { background: #3b1a3a; color: #e879f9; }
+  .badge-custom { background: #3b1028; color: #fb7185; }
+
+  .card h3 {
+    font-size: 18px;
+    color: #fff;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  /* Properties */
+  .props {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .prop {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .prop-label { color: #666; }
+  .prop-value { color: #ccc; font-weight: 500; }
+
+  /* Meter */
+  .meter {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+  }
+  .meter-bar {
+    width: 8px;
+    height: 12px;
+    border-radius: 2px;
+    background: #2a2a3a;
+  }
+  .meter-bar.filled { background: #818cf8; }
+  .meter-bar.filled.mid { background: #a78bfa; }
+  .meter-bar.filled.high { background: #e879f9; }
+
+  /* Examples list */
+  .examples {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #1e1e2e;
+  }
+  .examples-title {
+    font-size: 11px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .example-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .example-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    background: #1a1a2e;
+    border-radius: 4px;
+    color: #999;
+  }
+
+  /* Comparison table */
+  .comparison {
+    max-width: 1100px;
+    margin: 40px auto 0;
+  }
+  .comparison h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    background: #13131a;
+    color: #999;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #2a2a3a;
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #1a1a2a;
+    color: #ccc;
+    vertical-align: top;
+  }
+  tr:hover td { background: #13131a; }
+  td:first-child { color: #fff; font-weight: 500; }
+
+  .check { color: #4ade80; }
+  .cross { color: #666; }
+  .partial { color: #fbbf24; }
+
+  /* Your system callout */
+  .your-system {
+    border-color: #f43f5e44;
+    background: linear-gradient(135deg, #13131a, #1a0f18);
+  }
+  .your-system h3 { color: #fb7185; }
+
+  /* Flow diagram */
+  .flow-section {
+    max-width: 1100px;
+    margin: 50px auto 0;
+  }
+  .flow-section h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  .flow-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: center;
+    gap: 0;
+  }
+  .flow-box {
+    background: #13131a;
+    border: 1px solid #2a2a3a;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+  .flow-box h4 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .flow-box p {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.4;
+  }
+  .flow-arrow {
+    text-align: center;
+    color: #4a4a6a;
+    font-size: 24px;
+    padding: 0 8px;
+  }
+
+  /* Decision tree */
+  .decision {
+    max-width: 1100px;
+    margin: 50px auto 0;
+  }
+  .decision h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  .decision-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .decision-node {
+    background: #13131a;
+    border: 1px solid #2a2a3a;
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .decision-q {
+    font-size: 13px;
+    color: #ccc;
+    flex: 1;
+  }
+  .decision-a {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .decision-connector {
+    width: 2px;
+    height: 20px;
+    background: #2a2a3a;
+    margin-left: 40px;
+  }
+  .yes { background: #1a2e1a; color: #4ade80; }
+  .no { background: #2e1a1a; color: #f87171; margin-left: 8px; }
+  .arrow-label {
+    font-size: 10px;
+    color: #666;
+    margin-left: 44px;
+    padding: 2px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>AI Agent Landscape</h1>
+<p class="subtitle">From interactive coding assistants to custom domain-specific systems</p>
+
+<!-- Spectrum -->
+<div class="spectrum">
+  <div class="spectrum-bar"></div>
+  <div class="spectrum-labels">
+    <span>General Purpose / Interactive</span>
+    <span>Automated / Headless</span>
+    <span>Custom / Domain-Specific</span>
+  </div>
+</div>
+
+<!-- Cards -->
+<div class="grid">
+
+  <!-- Interactive Coding Agents -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-badge badge-interactive">Interactive Coding Agent</span>
+    </div>
+    <h3>Claude Code / Codex / Cursor</h3>
+    <p class="card-desc">
+      General-purpose coding agents you interact with in a terminal or IDE.
+      They have built-in tools (file edit, bash, search) and a human-in-the-loop
+      approving each step. The agent loop runs until the task is done or you intervene.
+    </p>
+    <div class="props">
+      <div class="prop">
+        <span class="prop-label">Workflow:</span>
+        <span class="prop-value">Freeform</span>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Human in loop:</span>
+        <span class="prop-value">Always</span>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Determinism:</span>
+        <div class="meter">
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar"></div>
+          <div class="meter-bar"></div>
+          <div class="meter-bar"></div>
+          <div class="meter-bar"></div>
+        </div>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Customization:</span>
+        <div class="meter">
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar"></div>
+          <div class="meter-bar"></div>
+          <div class="meter-bar"></div>
+        </div>
+      </div>
+    </div>
+    <div class="examples">
+      <div class="examples-title">Examples</div>
+      <div class="example-list">
+        <span class="example-tag">Claude Code (terminal)</span>
+        <span class="example-tag">OpenAI Codex CLI</span>
+        <span class="example-tag">Cursor</span>
+        <span class="example-tag">Windsurf</span>
+        <span class="example-tag">GitHub Copilot</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Automated Coding Agents -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-badge badge-automated">Automated Coding Agent</span>
+    </div>
+    <h3>Claude Code -p / GitHub Actions</h3>
+    <p class="card-desc">
+      Same general-purpose coding agents, but run headless via scripts or CI/CD.
+      No human in the loop during execution. Triggered by events (PR opened, issue tagged).
+      Still freeform — the agent decides what to do.
+    </p>
+    <div class="props">
+      <div class="prop">
+        <span class="prop-label">Workflow:</span>
+        <span class="prop-value">Freeform</span>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Human in loop:</span>
+        <span class="prop-value">Before/after only</span>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Determinism:</span>
+        <div class="meter">
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar"></div>
+          <div class="meter-bar"></div>
+          <div class="meter-bar"></div>
+          <div class="meter-bar"></div>
+        </div>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Customization:</span>
+        <div class="meter">
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled mid"></div>
+          <div class="meter-bar"></div>
+          <div class="meter-bar"></div>
+        </div>
+      </div>
+    </div>
+    <div class="examples">
+      <div class="examples-title">Examples</div>
+      <div class="example-list">
+        <span class="example-tag">claude -p "fix this"</span>
+        <span class="example-tag">claude-code-action</span>
+        <span class="example-tag">Codex --quiet</span>
+        <span class="example-tag">Devin</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- General Assistant Platforms -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-badge badge-platform">General Assistant Platform</span>
+    </div>
+    <h3>OpenClaw / Custom Assistants</h3>
+    <p class="card-desc">
+      Independent agent loop and tool system, not wrapping a coding agent.
+      LLM-agnostic, connects to messaging platforms (Slack, WhatsApp, etc.).
+      General-purpose but with its own architecture. Persistent memory across sessions.
+    </p>
+    <div class="props">
+      <div class="prop">
+        <span class="prop-label">Workflow:</span>
+        <span class="prop-value">Freeform</span>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Human in loop:</span>
+        <span class="prop-value">Conversational</span>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Determinism:</span>
+        <div class="meter">
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar"></div>
+          <div class="meter-bar"></div>
+          <div class="meter-bar"></div>
+        </div>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Customization:</span>
+        <div class="meter">
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled mid"></div>
+          <div class="meter-bar filled mid"></div>
+          <div class="meter-bar"></div>
+        </div>
+      </div>
+    </div>
+    <div class="examples">
+      <div class="examples-title">Examples</div>
+      <div class="example-list">
+        <span class="example-tag">OpenClaw</span>
+        <span class="example-tag">AutoGPT</span>
+        <span class="example-tag">Custom chatbots</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Frameworks -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-badge badge-framework">Agent Framework / SDK</span>
+    </div>
+    <h3>Claude Agent SDK / LangGraph / CrewAI</h3>
+    <p class="card-desc">
+      Libraries for building agents, not agents themselves. You define the tools,
+      the loop structure, and the orchestration. The framework handles the LLM API calls
+      and tool execution plumbing. You build whatever workflow you want on top.
+    </p>
+    <div class="props">
+      <div class="prop">
+        <span class="prop-label">Workflow:</span>
+        <span class="prop-value">You define it</span>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Human in loop:</span>
+        <span class="prop-value">You decide</span>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Determinism:</span>
+        <div class="meter">
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled mid"></div>
+          <div class="meter-bar filled mid"></div>
+          <div class="meter-bar"></div>
+        </div>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Customization:</span>
+        <div class="meter">
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled mid"></div>
+          <div class="meter-bar filled mid"></div>
+          <div class="meter-bar filled high"></div>
+        </div>
+      </div>
+    </div>
+    <div class="examples">
+      <div class="examples-title">Examples</div>
+      <div class="example-list">
+        <span class="example-tag">Claude Agent SDK</span>
+        <span class="example-tag">OpenAI Agents SDK</span>
+        <span class="example-tag">LangGraph</span>
+        <span class="example-tag">CrewAI</span>
+        <span class="example-tag">Pydantic AI</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Your System -->
+  <div class="card your-system full-width">
+    <div class="card-header">
+      <span class="card-badge badge-custom">Custom Domain-Specific System</span>
+    </div>
+    <h3>AI-Native Hedge Fund (Your System)</h3>
+    <p class="card-desc">
+      Custom-built agent loop with domain-specific orchestration. Hard-coded phased pipeline
+      (project &rarr; postmortem &rarr; refine &rarr; validate), policy-gated tool access,
+      deterministic caching with cutoff dates, and self-improving skills tracked in SQLite.
+      The workflow encodes financial domain logic — not a general agent, but a specific machine.
+    </p>
+    <div class="props">
+      <div class="prop">
+        <span class="prop-label">Workflow:</span>
+        <span class="prop-value">Hard-coded pipeline</span>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Human in loop:</span>
+        <span class="prop-value">Outer loop only (Amanda)</span>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Determinism:</span>
+        <div class="meter">
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled mid"></div>
+          <div class="meter-bar filled mid"></div>
+          <div class="meter-bar filled high"></div>
+        </div>
+      </div>
+      <div class="prop">
+        <span class="prop-label">Customization:</span>
+        <div class="meter">
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled"></div>
+          <div class="meter-bar filled mid"></div>
+          <div class="meter-bar filled mid"></div>
+          <div class="meter-bar filled high"></div>
+        </div>
+      </div>
+    </div>
+    <div class="examples">
+      <div class="examples-title">Unique properties</div>
+      <div class="example-list">
+        <span class="example-tag">Self-improving skills</span>
+        <span class="example-tag">Skill versioning + lineage</span>
+        <span class="example-tag">Policy-gated tools</span>
+        <span class="example-tag">Cutoff-scoped caching</span>
+        <span class="example-tag">Train/validation splits</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Comparison Table -->
+<div class="comparison">
+  <h2>Side-by-Side Comparison</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Claude Code<br>(Interactive)</th>
+        <th>Claude Code -p<br>(Automated)</th>
+        <th>OpenClaw<br>(Platform)</th>
+        <th>Agent SDK<br>(Framework)</th>
+        <th>Your System<br>(Custom)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>You write the agent loop?</td>
+        <td><span class="cross">No</span></td>
+        <td><span class="cross">No</span></td>
+        <td><span class="cross">No (built-in)</span></td>
+        <td><span class="partial">Partially</span></td>
+        <td><span class="check">Yes</span></td>
+      </tr>
+      <tr>
+        <td>You define the tools?</td>
+        <td><span class="cross">No (built-in)</span></td>
+        <td><span class="partial">Filter only</span></td>
+        <td><span class="check">Yes (skills)</span></td>
+        <td><span class="check">Yes</span></td>
+        <td><span class="check">Yes + policies</span></td>
+      </tr>
+      <tr>
+        <td>Workflow is deterministic?</td>
+        <td><span class="cross">No</span></td>
+        <td><span class="cross">No</span></td>
+        <td><span class="cross">No</span></td>
+        <td><span class="partial">Can be</span></td>
+        <td><span class="check">Yes</span></td>
+      </tr>
+      <tr>
+        <td>Learns from outputs?</td>
+        <td><span class="cross">No</span></td>
+        <td><span class="cross">No</span></td>
+        <td><span class="cross">No</span></td>
+        <td><span class="partial">If you build it</span></td>
+        <td><span class="check">Core feature</span></td>
+      </tr>
+      <tr>
+        <td>LLM-agnostic?</td>
+        <td><span class="cross">Claude only</span></td>
+        <td><span class="cross">Claude only</span></td>
+        <td><span class="check">Yes</span></td>
+        <td><span class="partial">Varies</span></td>
+        <td><span class="check">Yes (GPT-5.4)</span></td>
+      </tr>
+      <tr>
+        <td>Runs unsupervised?</td>
+        <td><span class="cross">No</span></td>
+        <td><span class="check">Yes</span></td>
+        <td><span class="check">Yes</span></td>
+        <td><span class="check">Yes</span></td>
+        <td><span class="check">Yes (inner loop)</span></td>
+      </tr>
+      <tr>
+        <td>Domain-specific?</td>
+        <td><span class="cross">Coding only</span></td>
+        <td><span class="cross">Coding only</span></td>
+        <td><span class="cross">General</span></td>
+        <td><span class="cross">General</span></td>
+        <td><span class="check">Finance</span></td>
+      </tr>
+      <tr>
+        <td>Setup effort</td>
+        <td>Minutes</td>
+        <td>Hours</td>
+        <td>Hours</td>
+        <td>Days</td>
+        <td>Weeks+</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Decision Tree -->
+<div class="decision">
+  <h2>Which Approach Should You Use?</h2>
+  <div class="decision-tree">
+    <div class="decision-node">
+      <span class="decision-q">Are you doing a <strong>coding task</strong> (edit files, fix bugs, write tests)?</span>
+      <span class="decision-a yes">Yes &rarr; Claude Code / Codex</span>
+    </div>
+    <div class="arrow-label">&darr; No</div>
+    <div class="decision-connector"></div>
+    <div class="decision-node">
+      <span class="decision-q">Do you want to <strong>automate coding tasks</strong> in CI/CD (PR review, test gen)?</span>
+      <span class="decision-a yes">Yes &rarr; Claude Code -p / GitHub Actions</span>
+    </div>
+    <div class="arrow-label">&darr; No</div>
+    <div class="decision-connector"></div>
+    <div class="decision-node">
+      <span class="decision-q">Do you need a <strong>general assistant</strong> across messaging platforms?</span>
+      <span class="decision-a yes">Yes &rarr; OpenClaw / similar</span>
+    </div>
+    <div class="arrow-label">&darr; No</div>
+    <div class="decision-connector"></div>
+    <div class="decision-node">
+      <span class="decision-q">Do you need a <strong>custom agent</strong> but want the LLM plumbing handled for you?</span>
+      <span class="decision-a yes">Yes &rarr; Agent SDK / LangGraph</span>
+    </div>
+    <div class="arrow-label">&darr; No</div>
+    <div class="decision-connector"></div>
+    <div class="decision-node">
+      <span class="decision-q">Do you need a <strong>domain-specific system</strong> with deterministic workflows, custom tools, and self-improvement?</span>
+      <span class="decision-a yes">Yes &rarr; Build your own (what you did)</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
